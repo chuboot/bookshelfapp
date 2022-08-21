@@ -1,11 +1,13 @@
 //document pertama kali diload
 const books = [];
 const RENDER_EVENT = "render-book";
+const SEARCH_EVENT = "search-book";
 const SAVED_EVENT = "saved-book";
 const STORAGE_KEY = "BOOK_APPS";
 
 document.addEventListener("DOMContentLoaded", function () {
   const submitForm = document.querySelector("#inputBook");
+  const searchForm = document.querySelector("#searchBook");
   submitForm.addEventListener("submit", function (ev) {
     ev.preventDefault();
     addBook();
@@ -14,7 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
   if (isStorageExist()) {
     loadDataFromStorage();
   }
+
+  searchForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    searchBook();
+  });
 });
+
+function searchBook() {
+  document.dispatchEvent(new Event(SEARCH_EVENT));
+}
 
 function addBook() {
   const titleBook = document.querySelector("#inputBookTitle").value;
@@ -195,6 +206,31 @@ document.addEventListener(RENDER_EVENT, function () {
       uncompleteBookRead.append(bookElement);
     } else {
       completeBookRead.append(bookElement);
+    }
+  }
+});
+document.addEventListener(SEARCH_EVENT, function () {
+  // console.log(books);
+  const uncompleteBookRead = document.querySelector("#incompleteBookshelfList");
+  uncompleteBookRead.innerHTML = "";
+
+  const completeBookRead = document.querySelector("#completeBookshelfList");
+  completeBookRead.innerHTML = "";
+
+  const titleSearch = document
+    .querySelector("#searchBookTitle")
+    .value.toLowerCase();
+
+  for (const book of books) {
+    const itemBook = book.title;
+    if (itemBook.toLowerCase().includes(titleSearch)) {
+      const bookElement = makeBook(book);
+
+      if (!book.isComplete) {
+        uncompleteBookRead.append(bookElement);
+      } else {
+        completeBookRead.append(bookElement);
+      }
     }
   }
 });
